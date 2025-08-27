@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: "auth-service"
+
+  devtools:
+    add-properties: false
+
+  #flyway:   # Opcional, solo si quieres manejar migraciones de base de datos
+  #  enabled: true
+  #  url: jdbc:postgresql://localhost:5432/mi_basedatos
+  #  user: mi_usuario
+  #  password: mi_password
+
+  profiles:
+    include: null
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,prometheus"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+cors:
+  allowed-origins: "http://localhost:4200,http://localhost:8080"
+
+adapters:
+  r2dbc:
+    host: localhost
+    port: 5432
+    database: crediya
+    username: leo
+    password: pragmaleo123
+    schema: public

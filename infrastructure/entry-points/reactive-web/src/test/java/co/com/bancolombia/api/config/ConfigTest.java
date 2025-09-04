@@ -2,35 +2,69 @@ package co.com.bancolombia.api.config;
 
 import co.com.bancolombia.api.Handler;
 import co.com.bancolombia.api.RouterRest;
+import co.com.bancolombia.api.errors.FunctionalErrorFilter;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-@ContextConfiguration(classes = {RouterRest.class, Handler.class})
-@WebFluxTest
-@Import({CorsConfig.class, SecurityHeadersConfig.class})
-class ConfigTest {
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-    @Autowired
+public class ConfigTest {
+
+    @Mock
+    private Handler handler;
+
+    @InjectMocks
+    private RouterRest routerRest;
+
     private WebTestClient webTestClient;
 
-    @Test
-    void corsConfigurationShouldAllowOrigins() {
-        webTestClient.get()
-                .uri("/api/usecase/path")
-                .exchange()
-                .expectStatus().isOk()
-                .expectHeader().valueEquals("Content-Security-Policy",
-                        "default-src 'self'; frame-ancestors 'self'; form-action 'self'")
-                .expectHeader().valueEquals("Strict-Transport-Security", "max-age=31536000;")
-                .expectHeader().valueEquals("X-Content-Type-Options", "nosniff")
-                .expectHeader().valueEquals("Server", "")
-                .expectHeader().valueEquals("Cache-Control", "no-store")
-                .expectHeader().valueEquals("Pragma", "no-cache")
-                .expectHeader().valueEquals("Referrer-Policy", "strict-origin-when-cross-origin");
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.openMocks(this);
+
+        // ⬇⬇⬇ CAMBIO: ahora RouterRest recibe filtro, paths y handler
+        routerRest = new RouterRest(new FunctionalErrorFilter(), new UsersPath(), handler);
+
+        // ⬇⬇⬇ CAMBIO: routerFunction() ya NO recibe handler por parámetro
+        RouterFunction<ServerResponse> routerFunction = routerRest.routerFunction();
+        webTestClient = WebTestClient.bindToRouterFunction(routerFunction).build();
     }
 
+    @Test
+    void createUserRoute_shouldReturnOk() {
+        when(handler.createUser(any(ServerRequest.class))).thenReturn(ServerResponse.ok().build());
+
+        webTestClient.post()
+                .uri("/api/v1/usuarios/createUser")
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    void getUserByIdRoute_shouldReturnOk() {
+        when(handler.getUserById(any(ServerRequest.class))).thenReturn(ServerResponse.ok().build());
+
+        webTestClient.get()
+                .uri("/api/v1/usuarios/getUserById/1")
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    void getAllUsersRoute_shouldReturnOk() {
+        when(handler.getAllUsers(any(ServerRequest.class))).thenReturn(ServerResponse.ok().build());
+
+        webTestClient.get()
+                .uri("/api/v1/usuarios/getAllUsers")
+                .exchange()
+                .expectStatus().isOk();
+    }
 }

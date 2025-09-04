@@ -1,7 +1,8 @@
-package co.com.bancolombia.api.config;
+package co.com.bancolombia.api.errors;
 
 import co.com.bancolombia.api.dto.response.CustomResponse;
 import co.com.bancolombia.api.dto.response.ErrorItem;
+import co.com.bancolombia.model.user.errors.BusinessException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -33,11 +34,11 @@ public class FunctionalErrorFilter implements HandlerFilterFunction<ServerRespon
     @Override
     public Mono<ServerResponse> filter(ServerRequest request, HandlerFunction<ServerResponse> next) {
         return next.handle(request)
-
                 .onErrorResume(ConstraintViolationException.class, e -> badRequestFromConstraintViolations(e, request))
                 .onErrorResume(ServerWebInputException.class, e -> badRequestFromServerWebInput(e, request))
                 .onErrorResume(WebExchangeBindException.class, e -> badRequestFromBindException(e, request))
                 .onErrorResume(DecodingException.class, e -> badRequestFromDecoding(e, request))
+                .onErrorResume(BusinessException.class, e -> businessError(e, request))
                 .onErrorResume(IllegalStateException.class, e -> conflict(e.getMessage(), request))
                 .onErrorResume(Throwable.class, e -> {
                     log.error("Unexpected error", e);
@@ -152,6 +153,28 @@ public class FunctionalErrorFilter implements HandlerFilterFunction<ServerRespon
                 || cls == int.class || cls == long.class || cls == double.class || cls == float.class
                 || "BigDecimal".equalsIgnoreCase(cls.getSimpleName())
                 || "BigInteger".equalsIgnoreCase(cls.getSimpleName());
+    }
+
+    private Mono<ServerResponse> businessError(BusinessException ex, ServerRequest req) {
+        var err = ErrorItem.of(
+                "business",
+                ex.getError().getCode(),
+                ex.getMessage()
+        );
+
+        var body = CustomResponse.<Void>fail(
+                        ex.getError().getStatus(),
+                        "Business Exception"
+                )
+                .toBuilder()
+                .errors(List.of(err))
+                .path(req.path())
+                .traceId(req.exchange().getRequest().getId())
+                .build();
+
+        return ServerResponse.status(ex.getError().getStatus())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body);
     }
 
     private static String safeMsg(String msg) {

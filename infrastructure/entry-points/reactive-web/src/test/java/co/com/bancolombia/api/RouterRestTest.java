@@ -1,10 +1,11 @@
 package co.com.bancolombia.api;
 
-import co.com.bancolombia.api.config.FunctionalErrorFilter;
+import co.com.bancolombia.api.errors.FunctionalErrorFilter;
+import co.com.bancolombia.api.config.UsersPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.reactive.function.server.HandlerFilterFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -22,15 +23,19 @@ public class RouterRestTest {
         handler = mock(Handler.class);
 
         FunctionalErrorFilter errorFilter = new FunctionalErrorFilter();
-        RouterRest routerRest = new RouterRest(errorFilter);
 
-        RouterFunction<ServerResponse> routerFunction = routerRest.routerFunction(handler);
+        // ⬇⬇⬇ CAMBIO: se crea UsersPath y se inyecta junto con el handler
+        UsersPath usersPath = new UsersPath();
+        RouterRest routerRest = new RouterRest(errorFilter, usersPath, handler);
+
+        // ⬇⬇⬇ CAMBIO: routerFunction() ya NO recibe handler por parámetro
+        RouterFunction<ServerResponse> routerFunction = routerRest.routerFunction();
         webTestClient = WebTestClient.bindToRouterFunction(routerFunction).build();
     }
 
     @Test
     void testCreateUserRoute() {
-        when(handler.createUser(any())).thenReturn(ServerResponse.ok().build());
+        when(handler.createUser(any(ServerRequest.class))).thenReturn(ServerResponse.ok().build());
 
         webTestClient.post()
                 .uri("/api/v1/usuarios/createUser")
@@ -40,7 +45,7 @@ public class RouterRestTest {
 
     @Test
     void testGetUserByIdRoute() {
-        when(handler.getUserById(any())).thenReturn(ServerResponse.ok().build());
+        when(handler.getUserById(any(ServerRequest.class))).thenReturn(ServerResponse.ok().build());
 
         webTestClient.get()
                 .uri("/api/v1/usuarios/getUserById/1")
@@ -50,7 +55,7 @@ public class RouterRestTest {
 
     @Test
     void testGetAllUsersRoute() {
-        when(handler.getAllUsers(any())).thenReturn(ServerResponse.ok().build());
+        when(handler.getAllUsers(any(ServerRequest.class))).thenReturn(ServerResponse.ok().build());
 
         webTestClient.get()
                 .uri("/api/v1/usuarios/getAllUsers")

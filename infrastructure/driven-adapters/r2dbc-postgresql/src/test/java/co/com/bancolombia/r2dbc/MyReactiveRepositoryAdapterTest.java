@@ -96,4 +96,16 @@ class MyReactiveRepositoryAdapterTest {
                 .expectNextMatches(savedUser -> savedUser.getEmail().equals("john.doe@test.com"))
                 .verifyComplete();
     }
+
+    @Test
+    void mustCheckIfEmailExists() {
+        String email = "john.doe@test.com";
+        when(repository.existsByEmail(email)).thenReturn(Mono.just(true));
+
+        Mono<Boolean> result = repositoryAdapter.existsByEmail(email);
+
+        StepVerifier.create(result)
+                .expectNext(true)
+                .verifyComplete();
+    }
 }

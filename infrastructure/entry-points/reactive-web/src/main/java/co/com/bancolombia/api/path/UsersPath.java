@@ -1,4 +1,4 @@
-package co.com.bancolombia.api.config;
+package co.com.bancolombia.api.path;
 
 import lombok.Getter;
 import org.springframework.stereotype.Component;
@@ -11,4 +11,6 @@ public class UsersPath {
     public String createUser() { return BASE + "/createUser"; }
     public String getAllUsers() { return BASE + "/getAllUsers"; }
     public String getUserById() { return BASE + "/getUserById/{id}"; }
+    public String getUserByEmail() { return BASE + "/getUserByEmail/{email}"; }
+    public String getUserByDocument() { return BASE + "/getUserByDocument/{document}"; }
 }

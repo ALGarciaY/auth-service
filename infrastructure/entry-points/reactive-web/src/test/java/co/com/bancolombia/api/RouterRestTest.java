@@ -1,34 +1,38 @@
 package co.com.bancolombia.api;
 
 import co.com.bancolombia.api.errors.FunctionalErrorFilter;
-import co.com.bancolombia.api.config.UsersPath;
+import co.com.bancolombia.api.path.LoginPath;
+import co.com.bancolombia.api.path.UsersPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class RouterRestTest {
 
-    private Handler handler;
+    @Mock private Handler handler;
+    @Mock private LoginHandler loginHandler;
+    @Mock private JwksHandler jwksHandler; // si RouterRest lo espera, mantenlo
+
     private WebTestClient webTestClient;
 
     @BeforeEach
     void setup() {
-        handler = mock(Handler.class);
-
         FunctionalErrorFilter errorFilter = new FunctionalErrorFilter();
-
-        // ⬇⬇⬇ CAMBIO: se crea UsersPath y se inyecta junto con el handler
         UsersPath usersPath = new UsersPath();
-        RouterRest routerRest = new RouterRest(errorFilter, usersPath, handler);
+        LoginPath loginPath = new LoginPath();
 
-        // ⬇⬇⬇ CAMBIO: routerFunction() ya NO recibe handler por parámetro
+        RouterRest routerRest = new RouterRest(errorFilter, usersPath, loginPath, handler, loginHandler, jwksHandler);
+
         RouterFunction<ServerResponse> routerFunction = routerRest.routerFunction();
         webTestClient = WebTestClient.bindToRouterFunction(routerFunction).build();
     }

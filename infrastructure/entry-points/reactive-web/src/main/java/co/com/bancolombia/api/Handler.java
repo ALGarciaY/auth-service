@@ -55,6 +55,36 @@ public class Handler {
 
     }
 
+    public Mono<ServerResponse> getUserByDocument(ServerRequest serverRequest) {
+        return useCase.getUserByDocument(serverRequest.pathVariable("document"))
+                .map(UserResponse::from)
+                .doOnNext(user -> log.info("getUserByDocument: {}", user))
+                .flatMap( user -> ServerResponse
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(CustomResponse.ok(user)
+                                .toBuilder()
+                                .path(serverRequest.path())
+                                .traceId(serverRequest.exchange().getRequest().getId())
+                                .build()));
+
+    }
+
+    public Mono<ServerResponse> getUserByEmail(ServerRequest serverRequest) {
+        return useCase.getUserByEmail(serverRequest.pathVariable("email"))
+                .map(UserResponse::from)
+                .doOnNext(user -> log.info("getUserByEmail: {}", user))
+                .flatMap( user -> ServerResponse
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(CustomResponse.ok(user)
+                                .toBuilder()
+                                .path(serverRequest.path())
+                                .traceId(serverRequest.exchange().getRequest().getId())
+                                .build()));
+
+    }
+
     public Mono<ServerResponse> getAllUsers(ServerRequest serverRequest) {
         return useCase.getAllUsers()
                 .map(UserResponse::from)

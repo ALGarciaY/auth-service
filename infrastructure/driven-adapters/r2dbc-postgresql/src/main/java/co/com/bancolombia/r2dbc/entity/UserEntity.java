@@ -1,4 +1,4 @@
-package co.com.bancolombia.r2dbc.data;
+package co.com.bancolombia.r2dbc.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,17 +17,20 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table("users")
-public class UserData {
+public class UserEntity {
     @Id
     @Column("id")
     private String id;
     private String firstName;
     private String lastName;
+    private String document;
     private String email;
     private BigDecimal baseSalary;
     private LocalDate birthDate;
     private String address;
     private String phone;
+    private Integer roleId;
+    private String password;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

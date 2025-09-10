@@ -6,7 +6,9 @@ import reactor.core.publisher.Mono;
 
 public interface UserRepository {
     Mono<Boolean> existsByEmail(String email);
+    Mono<User> findByEmail(String email);
     Mono<User> save(User user);
     Mono<User> findById(String id);
+    Mono<User> findByDocument(String document);
     Flux<User> findAll();
 }

@@ -17,23 +17,27 @@ public class UserResponse {
     private String id;
     private String firstName;
     private String lastName;
+    private String document;
     private String email;
     private String phone;
     private String address;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
     private BigDecimal baseSalary;
+    private Integer roleId;
 
     public static UserResponse from(User u) {
         return UserResponse.builder()
                 .id(u.getId())
                 .firstName(u.getFirstName())
                 .lastName(u.getLastName())
+                .document(u.getDocument())
                 .email(u.getEmail())
                 .phone(u.getPhone())
                 .address(u.getAddress())
                 .birthDate(u.getBirthDate())
                 .baseSalary(u.getBaseSalary())
+                .roleId(u.getRoleId())
                 .build();
     }
 }

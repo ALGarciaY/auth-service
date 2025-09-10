@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   application:
@@ -33,8 +33,14 @@ cors:
 adapters:
   r2dbc:
     host: localhost
-    port: 5432
+    port: 5433
     database: crediya
     username: leo
     password: pragmaleo123
     schema: public
+security:
+  jwt:
+    secret: ${JWT_SECRET:change-me-very-long-32+chars}
+    expiration-sec: 36000 # 1 hora
+    issuer: https://auth-service        # el 'iss' que pondrás en los tokens
+    audience: loan-service              # 'aud' que validará el loan-service

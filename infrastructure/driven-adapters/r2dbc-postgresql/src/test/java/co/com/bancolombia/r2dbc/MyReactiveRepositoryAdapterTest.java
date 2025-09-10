@@ -1,14 +1,13 @@
 package co.com.bancolombia.r2dbc;
 
 import co.com.bancolombia.model.user.User;
-import co.com.bancolombia.r2dbc.data.UserData;
+import co.com.bancolombia.r2dbc.entity.UserEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.reactivecommons.utils.ObjectMapper;
-import org.springframework.data.domain.Example;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -36,15 +35,18 @@ class MyReactiveRepositoryAdapterTest {
 
     private final UUID userId = UUID.randomUUID();
 
-    private final UserData userData = new UserData(
+    private final UserEntity userEntity = new UserEntity(
             userId.toString(),
             "John",
             "Doe",
+            "123456789",
             "john.doe@test.com",
             BigDecimal.valueOf(3000),
             LocalDate.of(1990, 1, 1),
             "123 Street",
             "1234567890",
+            1,
+            "hashedpassword",
             LocalDateTime.now(),
             LocalDateTime.now()
     );
@@ -62,8 +64,8 @@ class MyReactiveRepositoryAdapterTest {
 
     @Test
     void mustFindValueById() {
-        when(repository.findById(userId.toString())).thenReturn(Mono.just(userData));
-        when(mapper.map(userData, User.class)).thenReturn(user);
+        when(repository.findById(userId.toString())).thenReturn(Mono.just(userEntity));
+        when(mapper.map(userEntity, User.class)).thenReturn(user);
 
         Mono<User> result = repositoryAdapter.findById(userId.toString());
 
@@ -74,8 +76,8 @@ class MyReactiveRepositoryAdapterTest {
 
     @Test
     void mustFindAllValues() {
-        when(repository.findAll()).thenReturn(Flux.just(userData));
-        when(mapper.map(userData, User.class)).thenReturn(user);
+        when(repository.findAll()).thenReturn(Flux.just(userEntity));
+        when(mapper.map(userEntity, User.class)).thenReturn(user);
 
         Flux<User> result = repositoryAdapter.findAll();
 
@@ -86,9 +88,9 @@ class MyReactiveRepositoryAdapterTest {
 
     @Test
     void mustSaveValue() {
-        when(mapper.map(user, UserData.class)).thenReturn(userData); // domain -> entity
-        when(repository.save(userData)).thenReturn(Mono.just(userData));
-        when(mapper.map(userData, User.class)).thenReturn(user);     // entity -> domain
+        when(mapper.map(user, UserEntity.class)).thenReturn(userEntity); // domain -> entity
+        when(repository.save(userEntity)).thenReturn(Mono.just(userEntity));
+        when(mapper.map(userEntity, User.class)).thenReturn(user);     // entity -> domain
 
         Mono<User> result = repositoryAdapter.save(user);
 

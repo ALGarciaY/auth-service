@@ -25,11 +25,8 @@ import static org.mockito.Mockito.*;
 
 public class HandlerTest {
 
-    @Mock
-    private UserUseCase useCase;
-
-    @Mock
-    private DtoValidator validator;
+    @Mock private UserUseCase useCase;
+    @Mock private DtoValidator validator;
 
     @InjectMocks
     private Handler handler;
@@ -45,6 +42,7 @@ public class HandlerTest {
                 .firstName("Jane")
                 .lastName("Doe")
                 .email("jane" + id + "@example.com")
+                .document("DOC" + id)
                 .baseSalary(BigDecimal.valueOf(60000))
                 .birthDate(LocalDate.of(1992, 5, 10))
                 .address("Somewhere")
@@ -102,6 +100,50 @@ public class HandlerTest {
         when(request.exchange()).thenReturn(exchange);
 
         Mono<ServerResponse> responseMono = handler.getUserById(request);
+
+        StepVerifier.create(responseMono)
+                .expectNextMatches(serverResponse -> serverResponse.statusCode().is2xxSuccessful())
+                .verifyComplete();
+    }
+
+    @Test
+    void getUserByDocument_shouldReturnUserResponse() {
+        User user = buildUser("3");
+
+        when(useCase.getUserByDocument("DOC3")).thenReturn(Mono.just(user));
+
+        ServerRequest request = mock(ServerRequest.class);
+        when(request.pathVariable("document")).thenReturn("DOC3");
+        when(request.path()).thenReturn("/api/v1/usuarios/getUserByDocument/DOC3");
+
+        MockServerHttpRequest httpRequest = MockServerHttpRequest
+                .get("/api/v1/usuarios/getUserByDocument/DOC3").build();
+        MockServerWebExchange exchange = MockServerWebExchange.from(httpRequest);
+        when(request.exchange()).thenReturn(exchange);
+
+        Mono<ServerResponse> responseMono = handler.getUserByDocument(request);
+
+        StepVerifier.create(responseMono)
+                .expectNextMatches(serverResponse -> serverResponse.statusCode().is2xxSuccessful())
+                .verifyComplete();
+    }
+
+    @Test
+    void getUserByEmail_shouldReturnUserResponse() {
+        User user = buildUser("4");
+
+        when(useCase.getUserByEmail("jane4@example.com")).thenReturn(Mono.just(user));
+
+        ServerRequest request = mock(ServerRequest.class);
+        when(request.pathVariable("email")).thenReturn("jane4@example.com");
+        when(request.path()).thenReturn("/api/v1/usuarios/getUserByEmail/jane4@example.com");
+
+        MockServerHttpRequest httpRequest = MockServerHttpRequest
+                .get("/api/v1/usuarios/getUserByEmail/jane4@example.com").build();
+        MockServerWebExchange exchange = MockServerWebExchange.from(httpRequest);
+        when(request.exchange()).thenReturn(exchange);
+
+        Mono<ServerResponse> responseMono = handler.getUserByEmail(request);
 
         StepVerifier.create(responseMono)
                 .expectNextMatches(serverResponse -> serverResponse.statusCode().is2xxSuccessful())

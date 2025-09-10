@@ -24,8 +24,8 @@ public class UsersOpenApi {
     private final String CONFLICT = HttpStatus.CONFLICT.getReasonPhrase();
     private final String INTERNAL_ERROR = HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
 
-    public Builder createUser(Builder builder) {
-        return builder
+    public void createUser(Builder builder) {
+        builder
                 .operationId("createUser")
                 .summary("Crea un nuevo usuario")
                 .description("Registra un nuevo usuario en el sistema")
@@ -47,11 +47,21 @@ public class UsersOpenApi {
                                 .schema(schemaBuilder().implementation(CustomResponse.class))))
                 .response(responseBuilder().responseCode(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value())).description(INTERNAL_ERROR)
                         .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
+                                .schema(schemaBuilder().implementation(CustomResponse.class))))
+                .response(responseBuilder()
+                        .responseCode(String.valueOf(HttpStatus.UNAUTHORIZED.value()))
+                        .description("UNAUTHORIZED")
+                        .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
+                                .schema(schemaBuilder().implementation(CustomResponse.class))))
+                .response(responseBuilder()
+                        .responseCode(String.valueOf(HttpStatus.FORBIDDEN.value()))
+                        .description("FORBIDDEN")
+                        .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
                                 .schema(schemaBuilder().implementation(CustomResponse.class))));
     }
 
-    public Builder getAllUsers(Builder builder) {
-        return builder
+    public void getAllUsers(Builder builder) {
+        builder
                 .operationId("getAllUsers")
                 .summary("Obtener todos los usuarios")
                 .description("Devuelve la lista de usuarios")
@@ -67,8 +77,8 @@ public class UsersOpenApi {
                                 .schema(schemaBuilder().implementation(CustomResponse.class))));
     }
 
-    public Builder getUserById(Builder builder) {
-        return builder
+    public void getUserById(Builder builder) {
+        builder
                 .operationId("getUserById")
                 .summary("Obtener un usuario por ID")
                 .description("Busca un usuario por su identificador")
@@ -80,6 +90,54 @@ public class UsersOpenApi {
                         .description("ID del usuario")
                         .schema(schemaBuilder().implementation(String.class))
                         .example("42"))
+                .response(responseBuilder().responseCode(String.valueOf(HttpStatus.OK.value())).description(OK)
+                        .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
+                                .schema(schemaBuilder().implementation(CustomResponse.class))))
+                .response(responseBuilder().responseCode(String.valueOf(HttpStatus.NOT_FOUND.value())).description(NOT_FOUND)
+                        .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
+                                .schema(schemaBuilder().implementation(CustomResponse.class))))
+                .response(responseBuilder().responseCode(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value())).description(INTERNAL_ERROR)
+                        .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
+                                .schema(schemaBuilder().implementation(CustomResponse.class))));
+    }
+
+    public void getUserByDocument(Builder builder) {
+        builder
+                .operationId("getUserByDocument")
+                .summary("Obtener un usuario por documento")
+                .description("Busca un usuario por su numero de documento")
+                .tag(TAG)
+                .parameter(parameterBuilder()
+                        .name("document")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .description("Numero de documento del usuario")
+                        .schema(schemaBuilder().implementation(String.class))
+                        .example("123456789"))
+                .response(responseBuilder().responseCode(String.valueOf(HttpStatus.OK.value())).description(OK)
+                        .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
+                                .schema(schemaBuilder().implementation(CustomResponse.class))))
+                .response(responseBuilder().responseCode(String.valueOf(HttpStatus.NOT_FOUND.value())).description(NOT_FOUND)
+                        .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
+                                .schema(schemaBuilder().implementation(CustomResponse.class))))
+                .response(responseBuilder().responseCode(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value())).description(INTERNAL_ERROR)
+                        .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
+                                .schema(schemaBuilder().implementation(CustomResponse.class))));
+    }
+
+    public void getUserByEmail(Builder builder){
+        builder
+                .operationId("getUserByEmail")
+                .summary("Obtener un usuario por email")
+                .description("Busca un usuario por su direccion de correo electrónico")
+                .tag(TAG)
+                .parameter(parameterBuilder()
+                        .name("email")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .description("Correo electronico del usuario")
+                        .schema(schemaBuilder().implementation(String.class))
+                        .example("usuario@ejemplo.com"))
                 .response(responseBuilder().responseCode(String.valueOf(HttpStatus.OK.value())).description(OK)
                         .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
                                 .schema(schemaBuilder().implementation(CustomResponse.class))))

@@ -14,13 +14,21 @@ public enum BusinessError {
             "No hay usuarios registrados.",
             404),
 
+    ROLE_NOT_FOUND("ROLE_NOT_FOUND",
+            "Rol no encontrado.",
+            404),
+
     RECORDS_NOT_FOUND("RECORDS_NOT_FOUND",
             "No se encontraron registros.",
             404),
 
     BUSINESS_RULE_VIOLATION("BUSINESS_RULE_VIOLATION",
             "Regla de negocio violada.",
-            422);
+            422),
+
+    UNAUTHORIZED("UNAUTHORIZED",
+            "No autorizado.",
+            401);
 
     private final String code;
     private final String defaultMsg;

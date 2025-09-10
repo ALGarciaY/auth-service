@@ -21,7 +21,12 @@ public class CreateUserRequest {
     @NotBlank(message = "lastName es obligatorio")
     private String lastName;
 
-    @Email(message = "email inválido")
+    @NotBlank(message = "document es obligatorio")
+    @Size(min = 5, max = 15, message = "document debe tener entre 5 y 15 caracteres")
+    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "document solo puede contener caracteres alfanuméricos")
+    private String document;
+
+    @Email(message = "email invalido")
     @NotBlank(message = "email es obligatorio")
     private String email;
 
@@ -41,16 +46,21 @@ public class CreateUserRequest {
     @DecimalMax(value = "15000000.0", message = "baseSalary no puede ser mayor a 15,000,000")
     private BigDecimal baseSalary;
 
+    @NotNull(message = "roleId es obligatorio")
+    private Integer roleId;
+
     public User toDomain() {
         return User.builder()
                 .id(null)
                 .firstName(firstName)
                 .lastName(lastName)
+                .document(document)
                 .email(email)
                 .phone(phone)
                 .address(address)
                 .birthDate(birthDate)
                 .baseSalary(baseSalary)
+                .roleId(roleId)
                 .build();
     }
 }

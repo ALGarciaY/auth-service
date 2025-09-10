@@ -17,9 +17,17 @@ public class User {
     String id;
     String firstName;
     String lastName;
+    String document;
     String email;
     BigDecimal baseSalary;
     LocalDate birthDate;
     String address;
     String phone;
+    Integer roleId;
+    String roleName;
+    String password;
+
+    public boolean isEmpty() {
+        return this.id == null;
+    }
 }
